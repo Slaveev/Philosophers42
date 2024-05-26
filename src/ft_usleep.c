@@ -6,28 +6,29 @@
 /*   By: dslaveev <dslaveev@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/26 14:14:08 by dslaveev          #+#    #+#             */
-/*   Updated: 2024/05/26 14:22:41 by dslaveev         ###   ########.fr       */
+/*   Updated: 2024/05/26 15:07:53 by dslaveev         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
 
-void	ft_usleep(uint64_t time)
+int	ft_usleep(size_t milisecs)
 {
-	u_int64_t	start;
+	size_t	start;
 
 	start = get_time();
-	while (get_time() - start < time)
+	while (get_time() - start < milisecs)
 	{
 		usleep(500);
 	}
+	return (0);
 }
 
-u_int64_t	get_time(void)
+size_t	get_time(void)
 {
 	struct timeval	time;
 
-	if (gettimeofday(&time, NULL))
-		return (0);
+	if (gettimeofday(&time, NULL) == -1)
+		write(2, "getttimeofday error\n", 20);
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
