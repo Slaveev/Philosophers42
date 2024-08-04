@@ -39,62 +39,57 @@ int	check_args(int argc, char **argv)
 	return (1);
 }
 
-// void print_message()
-// {
-
-// 	if ()
-// 	{
-// 		;//If someone died you just return ;
-// 	}
-// 	pthread_mutex_lock(&data->dead);
-// 	printf("%llu %d %s\n", get_time() - data->start_time, philosopher->id, message);
-// 	pthread_mutex_unlock(&data->dead);
-// }
+void print_status(t_philo *philosopher, const char *msg)
+{
+    pthread_mutex_lock(&philosopher->data->print_mutex);
+    printf("%lu %d %s\n", get_time() - philosopher->data->start_time, philosopher->id, msg);
+    pthread_mutex_unlock(&philosopher->data->print_mutex);
+}
 
 void	think(t_philo *philosopher)
 {
-	printf("%llu %d is thinking\n", get_time() - philosopher->data->start_time, philosopher->id);
-	philosopher->state = THINKING;
+	print_status(philosopher, THINK);
+    philosopher->state = THINKING;
 }
 
 void	sleep_philo(t_philo *philosopher)
 {
-	printf("%llu %d is sleeping\n",get_time() - philosopher->data->start_time, philosopher->id);
-	philosopher->state = SLEEPING;
-	ft_usleep(philosopher->data->time_sleep * 1000);
+	print_status(philosopher, SLEEP);
+    philosopher->state = SLEEPING;
+    ft_usleep(philosopher->data->time_sleep * 1000);
 }
 
-void	eat(t_philo *philosopher)
+void eat(t_philo *philosopher)
 {
-	pthread_mutex_t	*first;
-	pthread_mutex_t	*second;
+    pthread_mutex_t *first;
+    pthread_mutex_t *second;
 
-	if (philosopher->left_fork < philosopher->right_fork)
-	{
-		first = philosopher->left_fork;
-		second = philosopher->right_fork;
-	}
-	else
-	{
-		first = philosopher->right_fork;
-		second = philosopher->left_fork;
-	}
-	pthread_mutex_lock(first);
-	printf("%llu %d has taken a fork\n", get_time() - philosopher->data->start_time, philosopher->id);
-	pthread_mutex_lock(second);
-	printf("%llu %d has taken a fork\n", get_time() - philosopher->data->start_time, philosopher->id);
-	printf("%llu %d is eating\n", get_time() - philosopher->data->start_time, philosopher->id);
-	philosopher->state = EATING;
-	philosopher->last_time_eat = get_time();
-	ft_usleep(philosopher->data->time_eat);
-	pthread_mutex_unlock(first);
-	pthread_mutex_unlock(second);
+    if (philosopher->left_fork < philosopher->right_fork)
+    {
+        first = philosopher->left_fork;
+        second = philosopher->right_fork;
+    }
+    else
+    {
+        first = philosopher->right_fork;
+        second = philosopher->left_fork;
+    }
+    pthread_mutex_lock(first);
+    print_status(philosopher, FORKS);
+    pthread_mutex_lock(second);
+    print_status(philosopher, FORKS);
+    print_status(philosopher, EAT);
+    philosopher->state = EATING;
+    philosopher->last_time_eat = get_time();
+    ft_usleep(philosopher->data->time_eat);
+    pthread_mutex_unlock(first);
+    pthread_mutex_unlock(second);
 }
 
 void *monitoring(void *data)
 {
 	t_data				*philo_data;
-	u_int16_t			time_diff_ms;
+	uint16_t			time_diff_ms;
 
 	philo_data = (t_data *)data;
 	while (philo_data->keep_iteration && philo_data->alive)
@@ -138,6 +133,8 @@ void	*routine(void *philo)
 	pthread_t	monitor;
 
 	philosopher = (t_philo *)philo;
+	if (philosopher->id % 2)
+		sleep_philo(philosopher);
 	while (1)
 	{
 		if (full_philos(philosopher->data))
