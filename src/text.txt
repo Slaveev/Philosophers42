@@ -1,0 +1,18 @@
+every philo need to have last time to eat;
+
+one thread just to check if the philo died;
+
+
+
+
+even number of philos:	time_to_die = time_to_eat + time_to_sleep + 10;
+odd number of philos: time_to_die = time_to_eat * 2 + time_to_sleep + 10;
+
+
+odd sleep = time_to_eat / 2
+
+odd takes fork from the right;
+even takes fork from the left;
+
+
+number of philos = id;
